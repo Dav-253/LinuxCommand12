@@ -3,98 +3,84 @@
 # Wait for 1 second to let the system settle
 sleep 1
 
-# Update package list and install Chinese language pack
+# === Step 1: Install Chinese language pack ===
 echo "Updating package list and installing Chinese language pack..."
 sudo apt update && sudo apt install -y task-chinese-s locales
 
-# Enable the zh_CN.UTF-8 locale by adding it to /etc/locale.gen
+# Enable zh_CN.UTF-8 locale
 echo "Enabling zh_CN.UTF-8 locale..."
 sudo sed -i '/zh_CN.UTF-8/s/^#//g' /etc/locale.gen
-
-# Generate the zh_CN.UTF-8 locale (non-interactive)
-echo "Generating zh_CN.UTF-8 locale..."
 sudo locale-gen
 
-# Set environment variables to use Chinese locale for the current session
-echo "Setting environment variables for Chinese locale (for current session)..."
+# Set environment variables for Chinese locale
+echo "Setting environment variables for Chinese locale..."
 export LANG=zh_CN.UTF-8
 export LANGUAGE=zh_CN:zh
 export LC_ALL=zh_CN.UTF-8
-export LC_CTYPE=zh_CN.UTF-8
-export LC_NUMERIC=zh_CN.UTF-8
-export LC_TIME=zh_CN.UTF-8
-export LC_COLLATE=zh_CN.UTF-8
-export LC_MONETARY=zh_CN.UTF-8
-export LC_MESSAGES=zh_CN.UTF-8
-export LC_PAPER=zh_CN.UTF-8
-export LC_NAME=zh_CN.UTF-8
-export LC_ADDRESS=zh_CN.UTF-8
-export LC_TELEPHONE=zh_CN.UTF-8
-export LC_MEASUREMENT=zh_CN.UTF-8
-export LC_IDENTIFICATION=zh_CN.UTF-8
 
-# Update the system locale to use the Chinese locale
+# Apply system-wide locale
 echo "Setting the system locale to Chinese..."
 sudo update-locale LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh LC_ALL=zh_CN.UTF-8
 
-# Verify the locale settings
+# Verify locale
 echo "Current locale settings:"
 locale
 
-# Output success message
 echo "Language has been set to Simplified Chinese!"
 echo "The change should take effect immediately in the terminal and GUI applications."
 
-# Optional: Run GNOME Language Selector (for GNOME desktop environments)
-# This command will help in applying language changes to the graphical interface without a reboot.
-echo "Running GNOME language selector (if using GNOME)..."
-gnome-language-selector &
-
-# Optional: Set the terminal to use Chinese (this will apply to the current session)
-echo "Setting language for the current terminal session..."
-export LANG=zh_CN.UTF-8
-export LANGUAGE=zh_CN:zh
-export LC_ALL=zh_CN.UTF-8
-
-# Reload the terminal configuration to apply the language settings
-echo "Reloading terminal settings..."
-source ~/.bashrc  # Or `source ~/.zshrc` if you're using Zsh
-
-# Check if everything is correctly set
-echo "Locale settings after applying changes:"
-locale
-
-# Step 1: Configure automatic login for user 'info'
-
-# Ensure the LightDM configuration file exists
+# === Step 2: Configure automatic login for user 'info' ===
 echo "Configuring automatic login for user 'info'..."
-sudo sh -c 'echo "[Seat:*]" >> /etc/lightdm/lightdm.conf'
+sudo sh -c 'echo "[Seat:*]" > /etc/lightdm/lightdm.conf'
 sudo sh -c 'echo "autologin-user=info" >> /etc/lightdm/lightdm.conf'
 sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
 
-# Step 2: Apply system-wide changes
 echo "Applying changes to LightDM configuration..."
-sudo systemctl restart lightdm
+sudo systemctl restart lightdm || echo "LightDM restart skipped (will apply on reboot)."
 
-# Step 3: Reboot the system to apply all changes
-echo "Rebooting the system..."
-sudo reboot
+# === Step 3: Create systemd user service to open a terminal after reboot ===
+echo "Creating a user systemd service to open the terminal after reboot..."
 
-# After reboot, the script should automatically continue running
-# Step 4: Ensure the terminal reopens and runs the desired command after login
+sudo -u info mkdir -p /home/info/.config/systemd/user
 
-# Create a systemd service to run the 'echo' command after reboot
-echo "Setting up systemd service to run 'echo Hello this is a message' after reboot..."
+sudo bash -c 'cat > /home/info/.config/systemd/user/open-terminal.service <<EOL
+[Unit]
+Description=Open Terminal After Login
+After=graphical-session.target
 
-# Create the systemd service file
+[Service]
+Type=simple
+ExecStart=gnome-terminal -- bash -c "echo -e \"\\e[32mHello! Terminal opened automatically after reboot.\\e[0m\"; exec bash"
+Restart=no
+Environment=LANG=zh_CN.UTF-8
+Environment=LC_ALL=zh_CN.UTF-8
+
+[Install]
+WantedBy=default.target
+EOL'
+
+# Fix permissions
+sudo chown info:info /home/info/.config/systemd/user/open-terminal.service
+
+# Enable lingering so user services start after login
+sudo loginctl enable-linger info
+
+# Enable the new user service
+sudo -u info systemctl --user enable open-terminal.service
+
+echo "User systemd service created and enabled successfully."
+
+# === Step 4: Create optional system-wide service (runs once after boot) ===
+echo "Setting up optional system-wide message service (for verification)..."
+
 sudo bash -c 'cat > /etc/systemd/system/echo_message.service <<EOL
 [Unit]
-Description=Run Echo Command After Reboot
+Description=Display message after reboot
 After=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c "echo \"Hello this is a message\""
+ExecStart=/bin/bash -c "echo \"System booted successfully!\""
 RemainAfterExit=true
 User=info
 Environment=LANG=zh_CN.UTF-8
@@ -104,9 +90,10 @@ Environment=LC_ALL=zh_CN.UTF-8
 WantedBy=multi-user.target
 EOL'
 
-# Enable the systemd service so it runs after reboot
 sudo systemctl enable echo_message.service
 
-# Exit gracefully (the script will keep running after login due to systemd service)
-echo "Systemd service set up successfully. The command will run after reboot."
-exit 0
+# === Step 5: Reboot to apply all changes ===
+echo "All setup steps completed successfully!"
+echo "The system will now reboot. After login, a terminal will automatically open."
+sleep 3
+sudo reboot
