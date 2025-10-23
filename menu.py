@@ -6,6 +6,7 @@ import subprocess
 # Define script file paths
 DEBIAN_UPDATE_SCRIPT = "./update.sh"
 GITHUB_UPDATE_SCRIPT = "./RepoUpdate.sh"
+MACHINE_HIJACK_PROGRAM = "./CommandLine.sh"
 
 def clear_screen():
     """Clears the terminal screen."""
@@ -44,9 +45,22 @@ def main_menu():
     while True:
         clear_screen()
         print("====== Main Menu ======")
+        print("")
+        print("==== Genreral Checks ====")
         print("1. Check and update Debian system")
         print("2. Check and pull GitHub repository")
-        print("3. Exit")
+        print("2. Check and pull GitHub repository")
+        
+        print("")
+        print("")
+        
+        print("==== Programs ====")
+        print("3. Machine Hijack")
+        
+        print("")
+        print("")
+        print("4. Exit")
+        
         print("=======================")
 
         choice = input("Enter your choice: ")
@@ -58,6 +72,9 @@ def main_menu():
             run_bash_script(GITHUB_UPDATE_SCRIPT)
             input("\nPress Enter to return to menu...")
         elif choice == '3':
+            run_bash_script(GITHUB_UPDATE_SCRIPT)
+            input("\nPress Enter to return to menu...")
+        elif choice == '4':
             print("Exiting program...")
             break
         else:
