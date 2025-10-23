@@ -15,8 +15,8 @@ sudo sed -i '/zh_CN.UTF-8/s/^#//g' /etc/locale.gen
 echo "Generating zh_CN.UTF-8 locale..."
 sudo locale-gen
 
-# Set environment variables to use Chinese locale
-echo "Setting environment variables for Chinese locale..."
+# Set environment variables to use Chinese locale for the current session
+echo "Setting environment variables for Chinese locale (for current session)..."
 export LANG=zh_CN.UTF-8
 export LANGUAGE=zh_CN:zh
 export LC_ALL=zh_CN.UTF-8
@@ -43,7 +43,12 @@ locale
 
 # Output success message
 echo "Language has been set to Simplified Chinese!"
-echo "Please log out and log back in for the display language to take effect in the GUI."
+echo "The change should take effect immediately in the terminal and GUI applications."
+
+# Optional: Run GNOME Language Selector (for GNOME desktop environments)
+# This command will help in applying language changes to the graphical interface without a reboot.
+echo "Running GNOME language selector (if using GNOME)..."
+gnome-language-selector &
 
 # Optional: Set the terminal to use Chinese (this will apply to the current session)
 echo "Setting language for the current terminal session..."
@@ -54,3 +59,4 @@ export LC_ALL=zh_CN.UTF-8
 # Check if everything is correctly set
 echo "Locale settings after applying changes:"
 locale
+
