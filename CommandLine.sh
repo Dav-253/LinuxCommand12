@@ -69,7 +69,7 @@ locale
 # Ensure the LightDM configuration file exists
 echo "Configuring automatic login..."
 sudo sh -c 'echo "[Seat:*]" >> /etc/lightdm/lightdm.conf'
-sudo sh -c 'echo "autologin-user=YOUR_USERNAME" >> /etc/lightdm/lightdm.conf'
+sudo sh -c 'echo "autologin-user=info" >> /etc/lightdm/lightdm.conf'
 sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
 
 # Step 2: Apply system-wide changes
