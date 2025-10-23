@@ -81,17 +81,32 @@ echo "Rebooting the system..."
 sudo reboot
 
 # After reboot, the script should automatically continue running
-# Step 4: Ensure the terminal reopens and continues executing the script
+# Step 4: Ensure the terminal reopens and continues execution after login
 
-# Add script continuation to the profile for auto-execution after login
-echo "Ensuring the terminal reopens and continues execution after login..."
+# Create a systemd service to run the script after the reboot
+echo "Setting up systemd service to run the script after reboot..."
 
-# We can add a command to run this script after login by adding it to .bashrc or .profile
-echo "# Automatically re-run script after login" >> ~/.bashrc
-echo "bash /path/to/this_script.sh" >> ~/.bashrc  # Replace with the correct script path
+# Create a systemd service file
+sudo bash -c 'cat > /etc/systemd/system/lang_setup.service <<EOL
+[Unit]
+Description=Run Language Setup Script
+After=multi-user.target
 
-# If you're using Zsh, use ~/.zshrc instead of ~/.bashrc
-# echo "bash /path/to/this_script.sh" >> ~/.zshrc
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /path/to/this_script.sh
+RemainAfterExit=true
+User=YOUR_USERNAME
+Environment=LANG=zh_CN.UTF-8
+Environment=LC_ALL=zh_CN.UTF-8
 
-# Exit gracefully (the script will keep running after login due to ~/.bashrc)
+[Install]
+WantedBy=multi-user.target
+EOL'
+
+# Enable the systemd service
+sudo systemctl enable lang_setup.service
+
+# Exit gracefully (the script will keep running after login due to systemd service)
+echo "Systemd service set up successfully. The script will continue running after reboot."
 exit 0
