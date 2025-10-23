@@ -5,7 +5,7 @@ import subprocess
 
 # Define the names of your Bash script files
 DEBIAN_UPDATE_SCRIPT = "./update.sh"
-GITHUB_UPDATE_SCRIPT = "./RepoUpdate.sh"
+GITHUB_UPDATE_SCRIPT = "RepoUpdate.sh"
 
 def clear_screen():
     """Clears the terminal screen."""
