@@ -45,6 +45,7 @@ def main_menu():
             run_bash_script(DEBIAN_UPDATE_SCRIPT)
             input("\nPress Enter to continue...")
         elif choice == '2':
+            chmod +x RepoUpdate.sh
             run_bash_script(GITHUB_UPDATE_SCRIPT)
             input("\nPress Enter to continue...")
         elif choice == '3':
