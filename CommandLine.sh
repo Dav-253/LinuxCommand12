@@ -56,7 +56,26 @@ export LANG=zh_CN.UTF-8
 export LANGUAGE=zh_CN:zh
 export LC_ALL=zh_CN.UTF-8
 
+# Reload the terminal configuration to apply the language settings
+echo "Reloading terminal settings..."
+source ~/.bashrc  # Or `source ~/.zshrc` if you're using Zsh
+
 # Check if everything is correctly set
 echo "Locale settings after applying changes:"
 locale
 
+# Step 1: Configure automatic login
+
+# Ensure the LightDM configuration file exists
+echo "Configuring automatic login..."
+sudo sh -c 'echo "[Seat:*]" >> /etc/lightdm/lightdm.conf'
+sudo sh -c 'echo "autologin-user=info" >> /etc/lightdm/lightdm.conf'
+sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
+
+# Step 2: Apply system-wide changes
+echo "Applying changes to LightDM configuration..."
+sudo systemctl restart lightdm
+
+# Step 3: Reboot the system to apply all changes
+echo "Rebooting the system..."
+sudo reboot
