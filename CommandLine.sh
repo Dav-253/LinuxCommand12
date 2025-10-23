@@ -127,7 +127,7 @@ EOF
 
 
 
-gsettings set org.gnome.desktop.background picture-uri 'file:///path/to/your/image.jpg'
+gsettings set org.gnome.desktop.background picture-uri './Wallpaper.png'
 
 
 sudo reboot
