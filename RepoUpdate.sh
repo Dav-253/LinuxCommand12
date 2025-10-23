@@ -28,6 +28,7 @@ if [ "$commits_behind" -gt 0 ]; then
     echo "Pulling latest changes..."
     git pull origin "$branch_name"
     echo "Pull complete."
+    echo "Restart the program to see new features!"
 else
     echo "Your local branch '$branch_name' is up to date with the remote."
 fi
