@@ -111,4 +111,18 @@ sudo systemctl enable echo_message.service
 echo "✅ All setup steps completed successfully!"
 echo "💡 The system will now reboot. After login, a terminal will automatically open."
 sleep 3
+
+mkdir -p ~/.config/autostart
+
+cat > ~/.config/autostart/open-terminal.desktop << 'EOF'
+[Desktop Entry]
+Type=Application
+Exec=xfce4-terminal --hold --command "echo '✅ Terminal opened automatically after reboot!'; exec bash"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Auto Terminal
+Comment=Open terminal automatically on startup
+EOF
+
 sudo reboot
