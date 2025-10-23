@@ -3,46 +3,37 @@
 
 #Check for any updates
 echo "Checking for updates..."
-sudo apt update > /dev/null
 
-# Get a count of upgradable packages.
-# 'apt list --upgradable' includes a header, so we subtract 1.
-upgradable_count=$(apt list --upgradable 2>/dev/null | wc -l)
+#!/bin/bash
 
-# The apt list command always returns a header, so a result of '1' means no updates.
-if [ "$upgradable_count" -gt 1 ]; then
-  echo "Updates are available. Proceeding with upgrade..."
-  sudo apt upgrade -y
-  echo "Upgrade complete."
-else
-  echo "No updates available. System is up to date."
+# Find the root directory of the current Git repository
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
+# Exit if not in a Git repository
+if [ -z "$REPO_ROOT" ]; then
+    echo "Error: Not a Git repository."
+    exit 1
 fi
 
+# Change to the repository's root directory
+cd "$REPO_ROOT"
 
-# Navigate to your Git repository directory.
-# Replace '/path/to/your/repo' with the actual path.
-cd ~/LinuxCommand12 || exit
+echo "Checking for updates in repository: $(basename "$REPO_ROOT")"
 
-# Fetch the latest information from the remote
-echo "Fetching latest changes from remote..."
+# Fetch the latest information from the remote without merging
 git fetch origin
 
 # Get the name of the current branch
 branch_name=$(git symbolic-ref --short HEAD)
 
-# Check the status against the remote branch
-status=$(git status -uno)
+# Get the number of commits the local branch is behind the remote branch
+commits_behind=$(git rev-list --count HEAD..origin/"$branch_name" 2>/dev/null)
 
-if echo "$status" | grep -q "up to date"; then
-  echo "Your local branch '$branch_name' is up to date with the remote."
-elif echo "$status" | grep -q "behind"; then
-  echo "Your local branch '$branch_name' is behind the remote. A 'git pull' is needed."
-elif echo "$status" | grep -q "ahead"; then
-  echo "Your local branch '$branch_name' is ahead of the remote. A 'git push' is needed."
+if [ "$commits_behind" -gt 0 ]; then
+    echo "Your local branch '$branch_name' is behind origin/$branch_name by $commits_behind commits."
+    echo "Pulling latest changes..."
+    git pull origin "$branch_name"
+    echo "Pull complete."
 else
-  echo "Something is not right, or there are uncommitted changes. Run 'git status' manually to investigate."
+    echo "Your local branch '$branch_name' is up to date with the remote."
 fi
-
-
-
-echo "Finished"
