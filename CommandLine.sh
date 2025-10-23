@@ -1,34 +1,40 @@
 #!/bin/bash
 
-# Wait for 1 second
+# Wait for 1 second to let the system settle
 sleep 1
 
-# Update package list
-echo "Updating package list..."
-sudo apt update
+# Update package list and install Chinese language pack
+echo "Updating package list and installing Chinese language pack..."
+sudo apt update && sudo apt install -y task-chinese-s locales
 
-# Install Chinese language pack
-echo "Installing Chinese language pack..."
-sudo apt install -y task-chinese-s
-
-# Generate the zh_CN.UTF-8 locale
+# Generate the zh_CN.UTF-8 locale if not already done
 echo "Generating zh_CN.UTF-8 locale..."
 sudo locale-gen zh_CN.UTF-8
 
-# Update the system locale to Chinese (Simplified)
+# Set environment variables to use Chinese locale
+echo "Setting environment variables for Chinese locale..."
+export LANG=zh_CN.UTF-8
+export LANGUAGE=zh_CN:zh
+export LC_ALL=zh_CN.UTF-8
+
+# Update the system locale
 echo "Setting the system locale to Chinese..."
 sudo update-locale LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh LC_ALL=zh_CN.UTF-8
 
-# Confirm the locale settings
-echo "Locale settings after update:"
+# Verify the locale settings
+echo "Current locale settings:"
 locale
 
 # Output success message
 echo "Language has been set to Simplified Chinese!"
 echo "Please log out and log back in for the display language to take effect in the GUI."
 
-# Optional: Set locale settings for terminal session
-echo "Setting language for the terminal session..."
+# Optional: Set the terminal to use Chinese (this will apply to the current session)
+echo "Setting language for the current terminal session..."
 export LANG=zh_CN.UTF-8
 export LANGUAGE=zh_CN:zh
 export LC_ALL=zh_CN.UTF-8
+
+# Check if everything is correctly set
+echo "Locale settings after applying changes:"
+locale
