@@ -7,13 +7,13 @@ sleep 1
 echo "Updating package list and installing Chinese language pack..."
 sudo apt update && sudo apt install -y task-chinese-s locales
 
-# Generate the zh_CN.UTF-8 locale if not already done
-echo "Generating zh_CN.UTF-8 locale..."
-sudo locale-gen zh_CN.UTF-8
+# Enable the zh_CN.UTF-8 locale by adding it to /etc/locale.gen
+echo "Enabling zh_CN.UTF-8 locale..."
+sudo sed -i '/zh_CN.UTF-8/s/^#//g' /etc/locale.gen
 
-# Reconfigure locales to ensure it's properly set
-echo "Reconfiguring locales..."
-sudo dpkg-reconfigure locales
+# Generate the zh_CN.UTF-8 locale (non-interactive)
+echo "Generating zh_CN.UTF-8 locale..."
+sudo locale-gen
 
 # Set environment variables to use Chinese locale
 echo "Setting environment variables for Chinese locale..."
@@ -33,7 +33,7 @@ export LC_TELEPHONE=zh_CN.UTF-8
 export LC_MEASUREMENT=zh_CN.UTF-8
 export LC_IDENTIFICATION=zh_CN.UTF-8
 
-# Update the system locale
+# Update the system locale to use the Chinese locale
 echo "Setting the system locale to Chinese..."
 sudo update-locale LANG=zh_CN.UTF-8 LANGUAGE=zh_CN:zh LC_ALL=zh_CN.UTF-8
 
