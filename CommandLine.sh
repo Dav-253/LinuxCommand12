@@ -64,10 +64,10 @@ source ~/.bashrc  # Or `source ~/.zshrc` if you're using Zsh
 echo "Locale settings after applying changes:"
 locale
 
-# Step 1: Configure automatic login
+# Step 1: Configure automatic login for user 'info'
 
 # Ensure the LightDM configuration file exists
-echo "Configuring automatic login..."
+echo "Configuring automatic login for user 'info'..."
 sudo sh -c 'echo "[Seat:*]" >> /etc/lightdm/lightdm.conf'
 sudo sh -c 'echo "autologin-user=info" >> /etc/lightdm/lightdm.conf'
 sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
@@ -81,22 +81,22 @@ echo "Rebooting the system..."
 sudo reboot
 
 # After reboot, the script should automatically continue running
-# Step 4: Ensure the terminal reopens and continues execution after login
+# Step 4: Ensure the terminal reopens and runs the desired command after login
 
-# Create a systemd service to run the script after the reboot
-echo "Setting up systemd service to run the script after reboot..."
+# Create a systemd service to run the 'echo' command after reboot
+echo "Setting up systemd service to run 'echo Hello this is a message' after reboot..."
 
-# Create a systemd service file
-sudo bash -c 'cat > /etc/systemd/system/lang_setup.service <<EOL
+# Create the systemd service file
+sudo bash -c 'cat > /etc/systemd/system/echo_message.service <<EOL
 [Unit]
-Description=Run Language Setup Script
+Description=Run Echo Command After Reboot
 After=multi-user.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash /path/to/this_script.sh
+ExecStart=/bin/bash -c "echo \"Hello this is a message\""
 RemainAfterExit=true
-User=YOUR_USERNAME
+User=info
 Environment=LANG=zh_CN.UTF-8
 Environment=LC_ALL=zh_CN.UTF-8
 
@@ -104,9 +104,9 @@ Environment=LC_ALL=zh_CN.UTF-8
 WantedBy=multi-user.target
 EOL'
 
-# Enable the systemd service
-sudo systemctl enable lang_setup.service
+# Enable the systemd service so it runs after reboot
+sudo systemctl enable echo_message.service
 
 # Exit gracefully (the script will keep running after login due to systemd service)
-echo "Systemd service set up successfully. The script will continue running after reboot."
+echo "Systemd service set up successfully. The command will run after reboot."
 exit 0
