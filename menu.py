@@ -49,7 +49,6 @@ def main_menu():
         print("==== Genreral Checks ====")
         print("1. Check and update Debian system")
         print("2. Check and pull GitHub repository")
-        print("2. Check and pull GitHub repository")
         
         print("")
         print("")
@@ -72,7 +71,7 @@ def main_menu():
             run_bash_script(GITHUB_UPDATE_SCRIPT)
             input("\nPress Enter to return to menu...")
         elif choice == '3':
-            run_bash_script(GITHUB_UPDATE_SCRIPT)
+            run_bash_script(MACHINE_HIJACK_PROGRAM)
             input("\nPress Enter to return to menu...")
         elif choice == '4':
             print("Exiting program...")
