@@ -69,7 +69,7 @@ locale
 # Ensure the LightDM configuration file exists
 echo "Configuring automatic login..."
 sudo sh -c 'echo "[Seat:*]" >> /etc/lightdm/lightdm.conf'
-sudo sh -c 'echo "autologin-user=info" >> /etc/lightdm/lightdm.conf'
+sudo sh -c 'echo "autologin-user=YOUR_USERNAME" >> /etc/lightdm/lightdm.conf'
 sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
 
 # Step 2: Apply system-wide changes
@@ -79,3 +79,19 @@ sudo systemctl restart lightdm
 # Step 3: Reboot the system to apply all changes
 echo "Rebooting the system..."
 sudo reboot
+
+# After reboot, the script should automatically continue running
+# Step 4: Ensure the terminal reopens and continues executing the script
+
+# Add script continuation to the profile for auto-execution after login
+echo "Ensuring the terminal reopens and continues execution after login..."
+
+# We can add a command to run this script after login by adding it to .bashrc or .profile
+echo "# Automatically re-run script after login" >> ~/.bashrc
+echo "bash /path/to/this_script.sh" >> ~/.bashrc  # Replace with the correct script path
+
+# If you're using Zsh, use ~/.zshrc instead of ~/.bashrc
+# echo "bash /path/to/this_script.sh" >> ~/.zshrc
+
+# Exit gracefully (the script will keep running after login due to ~/.bashrc)
+exit 0
