@@ -4,7 +4,7 @@ import os
 import subprocess
 
 # Define the names of your Bash script files
-DEBIAN_UPDATE_SCRIPT = "./DebianUpdates.sh"
+DEBIAN_UPDATE_SCRIPT = "./update.sh"
 GITHUB_UPDATE_SCRIPT = "./RepoUpdate.sh"
 
 def clear_screen():
@@ -16,14 +16,16 @@ def run_bash_script(script_path):
     Runs an external Bash script.
     The script must have execute permissions (chmod +x).
     """
+    print(f"Attempting to run script: {script_path}")
     try:
         # Use subprocess.run to execute the external script
-        # This will wait for the script to complete
+        # check=True will raise an exception if the script fails
         subprocess.run(script_path, check=True)
     except FileNotFoundError:
-        print(f"Error: The script '{script_path}' was not found.")
+        print(f"Error: The script '{script_path}' was not found. Please check the file path.")
     except subprocess.CalledProcessError as e:
         print(f"Error: The script '{script_path}' failed with exit code {e.returncode}.")
+        print("Please check the script for errors.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
 
@@ -40,11 +42,9 @@ def main_menu():
         choice = input("Enter your choice: ")
 
         if choice == '1':
-            print("Running Debian update script...")
             run_bash_script(DEBIAN_UPDATE_SCRIPT)
             input("\nPress Enter to continue...")
         elif choice == '2':
-            print("Running GitHub update script...")
             run_bash_script(GITHUB_UPDATE_SCRIPT)
             input("\nPress Enter to continue...")
         elif choice == '3':
