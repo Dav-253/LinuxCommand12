@@ -125,4 +125,9 @@ Name=Auto Terminal
 Comment=Open terminal automatically on startup
 EOF
 
+
+
+gsettings set org.gnome.desktop.background picture-uri 'file:///path/to/your/image.jpg'
+
+
 sudo reboot
