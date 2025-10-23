@@ -3,7 +3,7 @@
 import os
 import subprocess
 
-# Define the names of your Bash script files
+# Define script file paths
 DEBIAN_UPDATE_SCRIPT = "./update.sh"
 GITHUB_UPDATE_SCRIPT = "./RepoUpdate.sh"
 
@@ -13,24 +13,34 @@ def clear_screen():
 
 def run_bash_script(script_path):
     """
-    Runs an external Bash script.
-    The script must have execute permissions (chmod +x).
+    Runs an external Bash script safely using subprocess.
+    Automatically ensures it has execute permissions.
     """
-    print(f"Attempting to run script: {script_path}")
+    print(f"\nAttempting to run script: {script_path}\n")
+
     try:
-        # Use subprocess.run to execute the external script
-        # check=True will raise an exception if the script fails
-        subprocess.run(script_path, check=True)
-    except FileNotFoundError:
-        print(f"Error: The script '{script_path}' was not found. Please check the file path.")
+        # Check if script exists
+        if not os.path.isfile(script_path):
+            print(f"❌ Error: The script '{script_path}' was not found.")
+            return
+
+        # Give the script execute permissions (chmod +x)
+        subprocess.run(["chmod", "+x", script_path], check=True)
+
+        # Run the script using bash explicitly
+        subprocess.run(["bash", script_path], check=True)
+        print(f"\n✅ Script '{script_path}' executed successfully.\n")
+
     except subprocess.CalledProcessError as e:
-        print(f"Error: The script '{script_path}' failed with exit code {e.returncode}.")
-        print("Please check the script for errors.")
+        print(f"❌ Error: The script '{script_path}' failed with exit code {e.returncode}.")
+        print("Please check the script for issues.")
+    except PermissionError:
+        print(f"⚠️ Permission denied while trying to execute '{script_path}'. Try running this program with sudo.")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f"⚠️ Unexpected error: {e}")
 
 def main_menu():
-    """Displays the main menu and handles user input."""
+    """Displays the main menu and handles user choices."""
     while True:
         clear_screen()
         print("====== Main Menu ======")
@@ -43,17 +53,16 @@ def main_menu():
 
         if choice == '1':
             run_bash_script(DEBIAN_UPDATE_SCRIPT)
-            input("\nPress Enter to continue...")
+            input("\nPress Enter to return to menu...")
         elif choice == '2':
-            chmod +x RepoUpdate.sh
             run_bash_script(GITHUB_UPDATE_SCRIPT)
-            input("\nPress Enter to continue...")
+            input("\nPress Enter to return to menu...")
         elif choice == '3':
-            print("Exiting...")
+            print("Exiting program...")
             break
         else:
-            print("Invalid choice. Please enter a number from 1 to 3.")
-            input("\nPress Enter to continue...")
+            print("Invalid choice. Please enter 1, 2, or 3.")
+            input("\nPress Enter to try again...")
 
 if __name__ == "__main__":
     main_menu()
