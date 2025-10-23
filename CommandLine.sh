@@ -38,7 +38,25 @@ sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
 echo "Applying changes to LightDM configuration..."
 sudo systemctl restart lightdm || echo "LightDM restart skipped (will apply on reboot)."
 
-# === Step 3: Create systemd user service to open a terminal after reboot ===
+# === Step 3: Create autostart entry to open a terminal ===
+echo "Creating autostart entry for terminal..."
+
+sudo -u info mkdir -p /home/info/.config/autostart
+
+sudo bash -c 'cat > /home/info/.config/autostart/open-terminal.desktop <<EOL
+[Desktop Entry]
+Type=Application
+Exec=xfce4-terminal --hold --command "echo -e \"\\e[32m✅ Terminal opened automatically after reboot!\\e[0m\"; exec bash"
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=Auto Terminal
+Comment=Open terminal automatically on startup
+EOL'
+
+sudo chown info:info /home/info/.config/autostart/open-terminal.desktop
+
+# === Step 4: (Optional) Create a systemd user service to ensure terminal opens ===
 echo "Creating a user systemd service to open the terminal after reboot..."
 
 sudo -u info mkdir -p /home/info/.config/systemd/user
@@ -50,7 +68,7 @@ After=graphical-session.target
 
 [Service]
 Type=simple
-ExecStart=gnome-terminal -- bash -c "echo -e \"\\e[32mHello! Terminal opened automatically after reboot.\\e[0m\"; exec bash"
+ExecStart=xfce4-terminal --hold --command "echo -e \"\\e[32mTerminal opened automatically after reboot.\\e[0m\"; exec bash"
 Restart=no
 Environment=LANG=zh_CN.UTF-8
 Environment=LC_ALL=zh_CN.UTF-8
@@ -59,18 +77,15 @@ Environment=LC_ALL=zh_CN.UTF-8
 WantedBy=default.target
 EOL'
 
-# Fix permissions
 sudo chown info:info /home/info/.config/systemd/user/open-terminal.service
 
-# Enable lingering so user services start after login
+# Enable lingering so user services start without needing login
 sudo loginctl enable-linger info
 
 # Enable the new user service
-sudo -u info systemctl --user enable open-terminal.service
+sudo -u info systemctl --user enable open-terminal.service || echo "Will enable on next login."
 
-echo "User systemd service created and enabled successfully."
-
-# === Step 4: Create optional system-wide service (runs once after boot) ===
+# === Step 5: Optional system-wide service (for verification) ===
 echo "Setting up optional system-wide message service (for verification)..."
 
 sudo bash -c 'cat > /etc/systemd/system/echo_message.service <<EOL
@@ -92,8 +107,8 @@ EOL'
 
 sudo systemctl enable echo_message.service
 
-# === Step 5: Reboot to apply all changes ===
-echo "All setup steps completed successfully!"
-echo "The system will now reboot. After login, a terminal will automatically open."
+# === Step 6: Reboot to apply all changes ===
+echo "✅ All setup steps completed successfully!"
+echo "💡 The system will now reboot. After login, a terminal will automatically open."
 sleep 3
 sudo reboot
