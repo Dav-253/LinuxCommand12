@@ -7,21 +7,24 @@ gsettings set org.gnome.desktop.background picture-uri './Wallpaper.png'
 
 
 # === Step 3: Create autostart entry to open a terminal ===
-cd ~/.config/autostart
-vi gnome-terminal.desktop
-[Desktop Entry]
-Type=Application
-Exec=gnome-terminal
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Name[en_NG]=Terminal
-Name=Terminal
-Comment[en_NG]=Start Terminal On Startup
-Comment=Start Terminal On Startup
+echo "This script runs automatically on boot." > /var/log/my_script_output.log
+sudo chmod +x /usr/local/bin/my_script.sh
+sudo nano /etc/systemd/system/my_script.service
+[Unit]
+Description=My Custom Startup Script
+After=network.target
 
+[Service]
+ExecStart=/usr/local/bin/my_script.sh
+Restart=always
+User=your_username # Optional: run as a specific user
 
+[Install]
+WantedBy=multi-user.target
 
+sudo systemctl daemon-reload
+sudo systemctl enable my_script.service
+sudo systemctl start my_script.service
 
 
 # === Step 1: Install Chinese language pack ===
