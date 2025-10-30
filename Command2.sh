@@ -6,6 +6,24 @@ sleep 1
 gsettings set org.gnome.desktop.background picture-uri './Wallpaper.png'
 
 
+# === Step 3: Create autostart entry to open a terminal ===
+cd ~/.config/autostart
+vi gnome-terminal.desktop
+[Desktop Entry]
+Type=Application
+Exec=gnome-terminal
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_NG]=Terminal
+Name=Terminal
+Comment[en_NG]=Start Terminal On Startup
+Comment=Start Terminal On Startup
+
+
+
+
+
 # === Step 1: Install Chinese language pack ===
 echo "Updating package list and installing Chinese language pack..."
 sudo apt update && sudo apt install -y task-chinese-s locales
@@ -41,17 +59,6 @@ sudo sh -c 'echo "autologin-user-timeout=0" >> /etc/lightdm/lightdm.conf'
 echo "Applying changes to LightDM configuration..."
 sudo systemctl restart lightdm || echo "LightDM restart skipped (will apply on reboot)."
 
-# === Step 3: Create autostart entry to open a terminal ===
-
-mkdir -p ~/.config/autostart && tee ~/.config/autostart/gnome-terminal.desktop << EOF
-[Desktop Entry]
-Type=Application
-Exec=gnome-terminal
-Hidden=false
-X-GNOME-Autostart-enabled=true
-Name=Terminal
-Comment=Starts a terminal on login
-EOF
 
 
 
