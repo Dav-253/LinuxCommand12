@@ -4,7 +4,8 @@
 sleep 1
 
 
-echo -e "[Unit]\nDescription=Run my script at startup\nAfter=network.target\n\n[Service]\nExecStart=/./startupScript.sh\nRestart=always\nUser=yourusername\nGroup=yourgroup\n\n[Install]\nWantedBy=multi-user.target" | sudo tee /etc/systemd/system/my-script.service > /dev/null
+echo -e "[Unit]\nDescription=Run startupScript at startup\nAfter=network.target\n\n[Service]\nExecStart=/home/yourusername/startupScript.sh\nRestart=always\nUser=yourusername\nGroup=yourgroup\n\n[Install]\nWantedBy=multi-user.target" | sudo tee /etc/systemd/system/startupScript.service > /dev/null
+
 
 sudo systemctl daemon-reload
 
