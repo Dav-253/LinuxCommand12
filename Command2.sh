@@ -3,21 +3,62 @@
 # Wait for 1 second to let the system settle
 sleep 1
 
-gsettings set org.gnome.desktop.background picture-uri './Wallpaper.png'
 
 
-# === Step 3: Create autostart entry to open a terminal ===
-echo "This script runs automatically on boot." > /var/log/my_script_output.log
-sudo chmod +x /usr/local/bin/my_script.sh
-sudo nano /etc/systemd/system/my_script.service
+
+# Ensure running as root
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root or use sudo"
+  exit 1
+endif
+
+SERVICE_FILE="/etc/systemd/system/rc-local.service"
+RC_LOCAL_SCRIPT="/etc/rc.local"
+
+# 1. Create the rc-local.service file and add its content
+# Using a 'here document' (cat <<EOF >) is cleaner for multi-line content than multiple echo commands.
+cat <<EOF > "$SERVICE_FILE"
 [Unit]
-Description=My Custom Startup Script
-After=network.target
+Description=/etc/rc.local Compatibility
+ConditionPathExists=/etc/rc.local
 
 [Service]
-ExecStart=/usr/local/bin/my_script.sh
-Restart=always
-User=your_username # Optional: run as a specific user
+Type=forking
+ExecStart=/etc/rc.local start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "Created service file: $SERVICE_FILE"
+
+# 2. Enable the newly created service using systemctl
+systemctl enable rc.local
+echo "Enabled systemd service: rc-local.service"
+
+# 3. Create the actual /etc/rc.local script file (it should be executable)
+# Add a basic shebang to the script
+echo '#!/bin/bash' > "$RC_LOCAL_SCRIPT"
+# Add an exit 0 to ensure it always finishes successfully
+echo 'exit 0' >> "$RC_LOCAL_SCRIPT"
+
+# 4. Give the rc.local file appropriate permissions (make it executable)
+chmod +x "$RC_LOCAL_SCRIPT"
+
+echo "Created and made executable: $RC_LOCAL_SCRIPT"
+echo "Setup is complete."
+
+
+
+
+
+
+
+
 
 [Install]
 WantedBy=multi-user.target
