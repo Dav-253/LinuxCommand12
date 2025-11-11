@@ -3,6 +3,24 @@
 # Wait for 1 second to let the system settle
 sleep 1
 
+#!/bin/bash
+
+# Correct the path to your actual startupScript.sh
+SCRIPT_PATH="/home/yourusername/startupScript.sh"
+
+# Create the systemd service file for my-script.service
+echo -e "[Unit]\nDescription=Run startupScript at startup\nAfter=network.target\n\n[Service]\nExecStart=$SCRIPT_PATH\nRestart=always\nUser=yourusername\nGroup=yourgroup\n\n[Install]\nWantedBy=multi-user.target" | sudo tee /etc/systemd/system/my-script.service > /dev/null
+
+# Reload systemd to recognize the new service
+sudo systemctl daemon-reload
+
+# Enable the service to run at startup
+sudo systemctl enable my-script.service
+
+# Start the service immediately (optional)
+sudo systemctl start my-script.service
+
+
 
 echo -e "[Unit]\nDescription=Run startupScript at startup\nAfter=network.target\n\n[Service]\nExecStart=/home/yourusername/startupScript.sh\nRestart=always\nUser=yourusername\nGroup=yourgroup\n\n[Install]\nWantedBy=multi-user.target" | sudo tee /etc/systemd/system/startupScript.service > /dev/null
 
