@@ -6,10 +6,12 @@ sleep 1
 
 echo -e "[Unit]\nDescription=Run startupScript at startup\nAfter=network.target\n\n[Service]\nExecStart=/home/yourusername/startupScript.sh\nRestart=always\nUser=yourusername\nGroup=yourgroup\n\n[Install]\nWantedBy=multi-user.target" | sudo tee /etc/systemd/system/startupScript.service > /dev/null
 
+chmod +x ~/LinuxCommand12/startupScript.sh
 
 sudo systemctl daemon-reload
 
 sudo systemctl enable my-script.service
+sudo systemctl start startupScript.service
 
 sudo systemctl status my-script.service #Check status of service
 
